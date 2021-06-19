@@ -16,12 +16,24 @@ export class SimpleAppStack extends cdk.Stack {
       encryption: BucketEncryption.S3_MANAGED,
     });
 
-    const bucketDeployment = new BucketDeployment(this, 'MySimpleAppPhotos', {
+    new BucketDeployment(this, 'MySimpleAppPhotos', {
       sources: [
         Source.asset(path.join(__dirname, '..', 'photos')),
       ],
       destinationBucket: bucket
-    })
+    });
+
+    const websiteBucket = new Bucket(this, 'MySimpleAppWebsiteBucket', {
+      websiteIndexDocument: 'index.html',
+      publicReadAccess: true,
+    });
+
+    new BucketDeployment(this, 'MySimpleAppWebsiteDeploy', {
+      sources: [
+        Source.asset(path.join(__dirname, '..', 'frontend', 'build'))
+      ],
+      destinationBucket: websiteBucket
+    });
 
     const getPhotos = new lambda.NodejsFunction(this, 'MySimpleAppLambda', {
       runtime: Runtime.NODEJS_14_X,
@@ -72,6 +84,11 @@ export class SimpleAppStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'MySimpleAppApi', {
       value: httpApi.url!,
       exportName: 'MySimpleAppApiEndpoint',
+    });
+
+    new cdk.CfnOutput(this, 'MySimpleAppWebsiteBucketNameExport', {
+      value: websiteBucket.bucketName,
+      exportName: 'MySimpleAppWebsiteBucketName'
     });
   }
 }
