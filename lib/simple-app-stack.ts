@@ -12,6 +12,7 @@ import { S3Origin } from '@aws-cdk/aws-cloudfront-origins';
 import { ARecord, IPublicHostedZone, RecordTarget } from '@aws-cdk/aws-route53';
 import { ICertificate } from '@aws-cdk/aws-certificatemanager';
 import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
+import { S3BucketWithDeploy } from './s3-bucket-with-deploy';
 
 interface SimpleAppStackProps extends cdk.StackProps {
   hostedZone: IPublicHostedZone
@@ -23,7 +24,8 @@ export class SimpleAppStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: SimpleAppStackProps) {
     super(scope, id, props);
 
-    const bucket = new Bucket(this, 'MySimpleAppBucket', {
+    const { bucket } = new S3BucketWithDeploy(this, 'MySimpleAppCustomBucket', {
+      deployTo: ['..', 'photos'],
       encryption: BucketEncryption.S3_MANAGED,
     });
 
