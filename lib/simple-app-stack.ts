@@ -29,13 +29,6 @@ export class SimpleAppStack extends cdk.Stack {
       encryption: BucketEncryption.S3_MANAGED,
     });
 
-    new BucketDeployment(this, 'MySimpleAppPhotos', {
-      sources: [
-        Source.asset(path.join(__dirname, '..', 'photos')),
-      ],
-      destinationBucket: bucket
-    });
-
     const websiteBucket = new Bucket(this, 'MySimpleAppWebsiteBucket', {
       websiteIndexDocument: 'index.html',
       publicReadAccess: true,
