@@ -9,8 +9,11 @@ import { CorsHttpMethod, HttpApi, HttpMethod } from '@aws-cdk/aws-apigatewayv2';
 import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
 import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront';
 
+interface SimpleAppStackProps extends cdk.StackProps {
+}
+
 export class SimpleAppStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.Construct, id: string, props?: SimpleAppStackProps) {
     super(scope, id, props);
 
     const bucket = new Bucket(this, 'MySimpleAppBucket', {
