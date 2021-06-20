@@ -7,13 +7,20 @@ import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
 import { CorsHttpMethod, HttpApi, HttpMethod } from '@aws-cdk/aws-apigatewayv2';
 import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
-import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront';
+import { Distribution } from '@aws-cdk/aws-cloudfront';
+import { S3Origin } from '@aws-cdk/aws-cloudfront-origins';
+import { ARecord, IPublicHostedZone, RecordTarget } from '@aws-cdk/aws-route53';
+import { ICertificate } from '@aws-cdk/aws-certificatemanager';
+import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
 
 interface SimpleAppStackProps extends cdk.StackProps {
+  hostedZone: IPublicHostedZone
+  certificate: ICertificate
+  dnsName: string
 }
 
 export class SimpleAppStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: SimpleAppStackProps) {
+  constructor(scope: cdk.Construct, id: string, props: SimpleAppStackProps) {
     super(scope, id, props);
 
     const bucket = new Bucket(this, 'MySimpleAppBucket', {
@@ -32,15 +39,15 @@ export class SimpleAppStack extends cdk.Stack {
       publicReadAccess: true,
     });
 
-    const cloudFront = new CloudFrontWebDistribution(this, 'MySimpleAppDistribution', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: websiteBucket,
-          },
-          behaviors: [{ isDefaultBehavior: true }]
-        }
-      ]
+    const cloudFront = new Distribution(this, 'MySimpleAppDistribution', {
+      defaultBehavior: { origin: new S3Origin(websiteBucket) },
+      domainNames: [props?.dnsName],
+      certificate: props.certificate,
+    });
+
+    new ARecord(this, 'MySimpleAppARecordApex', {
+      zone: props.hostedZone,
+      target: RecordTarget.fromAlias(new CloudFrontTarget(cloudFront)),
     });
 
     new BucketDeployment(this, 'MySimpleAppWebsiteDeploy', {
