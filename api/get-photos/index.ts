@@ -33,4 +33,23 @@ async function getPhotos(event: APIGatewayProxyEventV2, ctx: Context): Promise<A
     }
 }
 
-export { getPhotos }
+async function getPhoto(event: APIGatewayProxyEventV2, ctx: Context): Promise<APIGatewayProxyStructuredResultV2> {
+    console.log(event.pathParameters);
+    const key = event.pathParameters!['photoName']!;
+    try {
+        const photo = await generateUrl({
+            Key: key,
+        });
+        return {
+            statusCode: 200,
+            body: JSON.stringify(photo),
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: error.message,
+        }
+    }
+};
+
+export { getPhotos, getPhoto };

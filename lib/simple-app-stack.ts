@@ -53,10 +53,19 @@ export class SimpleAppStack extends cdk.Stack {
       distribution: cloudFront,
     });
 
-    const getPhotos = new lambda.NodejsFunction(this, 'MySimpleAppLambda', {
+    const getPhotos = new lambda.NodejsFunction(this, 'MySimpleAppPhotosLambda', {
       runtime: Runtime.NODEJS_14_X,
       entry: path.join(__dirname, '..', 'api', 'get-photos', 'index.ts'),
       handler: 'getPhotos',
+      environment: {
+        PHOTO_BUCKET_NAME: bucket.bucketName,
+      }
+    });
+
+    const getPhoto = new lambda.NodejsFunction(this, 'MySimpleAppPhotoLambda', {
+      runtime: Runtime.NODEJS_14_X,
+      entry: path.join(__dirname, '..', 'api', 'get-photos', 'index.ts'),
+      handler: 'getPhoto',
       environment: {
         PHOTO_BUCKET_NAME: bucket.bucketName,
       }
@@ -73,6 +82,9 @@ export class SimpleAppStack extends cdk.Stack {
     getPhotos.addToRolePolicy(bucketPermissions);
     getPhotos.addToRolePolicy(bucketContainerPermissions);
 
+    getPhoto.addToRolePolicy(bucketPermissions);
+    getPhoto.addToRolePolicy(bucketContainerPermissions);
+
     const httpApi = new HttpApi(this, 'MySimpleAppHttpApi', {
       corsPreflight: {
         allowOrigins: ['*'],
@@ -82,8 +94,12 @@ export class SimpleAppStack extends cdk.Stack {
       createDefaultStage: true
     });
 
-    const lambdaIntegration = new LambdaProxyIntegration({
+    const photosLambdaIntegration = new LambdaProxyIntegration({
       handler: getPhotos,
+    });
+
+    const photoLambdaIntegration = new LambdaProxyIntegration({
+      handler: getPhoto,
     });
 
     httpApi.addRoutes({
@@ -91,7 +107,15 @@ export class SimpleAppStack extends cdk.Stack {
       methods: [
         HttpMethod.GET,
       ],
-      integration: lambdaIntegration
+      integration: photosLambdaIntegration
+    });
+
+    httpApi.addRoutes({
+      path: '/getPhoto/photoName',
+      methods: [
+        HttpMethod.GET,
+      ],
+      integration: photoLambdaIntegration
     });
 
     new cdk.CfnOutput(this, 'MySimpleAppBucketNameExport', {
