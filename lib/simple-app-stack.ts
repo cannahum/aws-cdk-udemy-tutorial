@@ -1,18 +1,18 @@
-import { Bucket, BucketEncryption } from '@aws-cdk/aws-s3';
+import {Bucket, BucketEncryption} from '@aws-cdk/aws-s3';
 import * as lambda from '@aws-cdk/aws-lambda-nodejs';
 import * as cdk from '@aws-cdk/core';
-import { Runtime } from '@aws-cdk/aws-lambda';
+import {Runtime} from '@aws-cdk/aws-lambda';
 import * as path from 'path';
-import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
-import { PolicyStatement } from '@aws-cdk/aws-iam';
-import { CorsHttpMethod, HttpApi, HttpMethod } from '@aws-cdk/aws-apigatewayv2';
-import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
-import { Distribution } from '@aws-cdk/aws-cloudfront';
-import { S3Origin } from '@aws-cdk/aws-cloudfront-origins';
-import { ARecord, IPublicHostedZone, RecordTarget } from '@aws-cdk/aws-route53';
-import { ICertificate } from '@aws-cdk/aws-certificatemanager';
-import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
-import { S3BucketWithDeploy } from './s3-bucket-with-deploy';
+import {BucketDeployment, Source} from '@aws-cdk/aws-s3-deployment';
+import {PolicyStatement} from '@aws-cdk/aws-iam';
+import {CorsHttpMethod, HttpApi, HttpMethod} from '@aws-cdk/aws-apigatewayv2';
+import {LambdaProxyIntegration} from '@aws-cdk/aws-apigatewayv2-integrations';
+import {Distribution} from '@aws-cdk/aws-cloudfront';
+import {S3Origin} from '@aws-cdk/aws-cloudfront-origins';
+import {ARecord, IPublicHostedZone, RecordTarget} from '@aws-cdk/aws-route53';
+import {ICertificate} from '@aws-cdk/aws-certificatemanager';
+import {CloudFrontTarget} from '@aws-cdk/aws-route53-targets';
+import {S3BucketWithDeploy} from './s3-bucket-with-deploy';
 
 interface SimpleAppStackProps extends cdk.StackProps {
   hostedZone: IPublicHostedZone
